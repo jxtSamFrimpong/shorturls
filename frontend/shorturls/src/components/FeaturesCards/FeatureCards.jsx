@@ -24,7 +24,7 @@ const FeatureCards = ({}) => {
     console.log(`featured Data`, featuresData)
 
     return (
-        <div class="features">
+        <div className="features">
             {
                 featuresData.map( i => {
                     console.log(`rendering one feature item ${i.featureHeader}`)

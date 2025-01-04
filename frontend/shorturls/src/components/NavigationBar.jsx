@@ -1,11 +1,11 @@
 const NavigationBar = ({})=> {
     return (
         <nav>
-            <div class="logo">
-                <div class="logo-circle"></div>
+            <div className="logo">
+                <div className="logo-circle"></div>
                 SHORTEN.IT
             </div>
-            <button class="login-btn">LOGIN</button>
+            <button className="login-btn">LOGIN</button>
         </nav>
     )
 }
