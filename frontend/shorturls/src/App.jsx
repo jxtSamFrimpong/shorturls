@@ -14,30 +14,7 @@ function App() {
 
         <HomeShortenURLHero />
 
-        <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon"></div>
-                <div>
-                    <h3>Shorten</h3>
-                    <p>Create short links instantly</p>
-                </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon"></div>
-                <div>
-                    <h3>Measure</h3>
-                    <p>Track and analyze your links</p>
-                </div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon"></div>
-                <div>
-                    <h3>Optimize</h3>
-                    <p>Improve your link performance</p>
-                </div>
-            </div>
-        </div>
-        {/* <FeatureCards /> */}
+        <FeatureCards />
 
         <div class="pricing">
             <h2>The right plan for your needs</h2>
