@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import FeatureItem from './FeatureItem'
 
 const FeatureCards = ({}) => {
 
@@ -28,13 +29,7 @@ const FeatureCards = ({}) => {
                 featuresData.map( i => {
                     console.log(`rendering one feature item ${i.featureHeader}`)
                     return (
-                        <div className="feature-card" key={i.featureHeader}>
-                            <div className="feature-icon"></div>
-                            <div>
-                                <h3>{i.featureHeader}</h3>
-                                <p>{i.description}</p>
-                            </div>
-                        </div>
+                        <FeatureItem iconObject={i.iconObject} featureHeader={i.featureHeader} description={i.description} key={i.featureHeader}/>
                     )
                 })
             }
