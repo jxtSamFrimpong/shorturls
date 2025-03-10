@@ -1,4 +1,6 @@
-.venv
-venv
+*.venv*
+*venv*
 .env
+.docker-compose.env
 node_modules
+sonarqube-upgrade.md

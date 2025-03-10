@@ -1,81 +1,151 @@
-const shorturls = {
-    "amblical": {
-        url: "example.com",
-        clickCount: 0,
-        uniqueClicks: 0,
-        stats: {
-            referrerInformation: null,
-            geoLocation: null,
-            userAgent: null,
-            ipAddress: null,
-            dateOfVisit: null,
-            deviceType: null,
-            browserType: null,
-            clickThroughRate: null, //READ MORE ON THIS IMPLEMENTATION
-            bounceRate: null, //READ MORE ON THIS IMPLEMENTATION
-        },
-        description: null,
-        socialShares: 0,
-        backlinks: [], //READ MORE ON THIS IMPLEMENTATION
-        type: "direct", //ENUM direct or linkSet
-        dateCreated: null,
-        dateLastUpdated: null,
-        dateLastFetched: null,
-        dateExpiry: null,
-        editHistory: [],
-        userId: null,
-        paymentTier: null, 
-        premieredLink: false,
-        premieres: {
-            datePremiered: null,
-            premieredMessage: [], /* should be its own table
-            with its own ids and premieredMessageOrderNumber
-            premeir message can be a text, picture, video
-            */
-        },
-        /* PAYMENT TIER should be tied to the user and not the link, 
-        but affects many properties of he link, 
-        free users cant create linkSet links, 
-        have a max number of links to create and more */
-        categories: [], /*  SHOULD BE AN ENUM
-        comma separated list of predefined categories
-        exception: would not be its own table, would be part of shorturls
-        */
-        customTag: [], /* FOR categories not in category
-        comma separated list of custom tags,
-        exception: would not be its own table, would be part of shorturls
-        */
-       publicLink: true,
-       whitelistOrigins: {
+const { DataTypes } = require('sequelize');
+const db = require('../utils/database');
+const modelOptionsGen = require('../utils/model-options')
+const User = require('./users')
 
-       },
-       blackListOrigins: {},
-       rateLimits: 10 /*
-       to be used to implement rate limiting based on the user payment tier, 
-       default is 100rpm, 
-       can increased up to the limit of the user
-       would be set on both user table and short url's table */
-    },
-    "diamond": {
-        url: "web3.com",
-        clickCount: 0,
-        type: "direct",
-        dateCreated: null,
-        dateLastUpdated: null,
-        dateLastFetched: null,
-        userId: null,
-        paymentTier: null
-    },
-    "google": {
-        url: "http://www.google.com/",
-        clickCount: 0,
-        type: "direct",
-        dateCreated: null,
-        dateLastUpdated: null,
-        dateLastFetched: null,
-        userId: null,
-        paymentTier: null
-    }
-}
+const options = modelOptionsGen('shorturls')
 
-module.exports = shorturls
+const ShortUrl = db.define('shorturl',
+    {
+        url: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+            validate: {
+                notEmpty: true
+            }
+        },
+        shorturl: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            primaryKey: true,
+            validate: {
+                notEmpty: true
+            }
+        },
+        clickCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
+        uniqueClicks: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
+        description: {
+            type: DataTypes.TEXT
+        },
+        socialShareCount: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        },
+        type: {
+            type: DataTypes.ENUM('directLinks', 'setLinks'),
+            defaultValue: 'directLinks'
+        },
+        dateCreated: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            get() {
+                return this.getDataValue('dateCreated')
+                  ?.toISOString()
+                  .slice(0, 19)
+                  .replace('T', ' '); // Format: 'YYYY-MM-DD HH:mm:ss'
+            },
+            validate: {
+                isDate: true
+            }
+        },
+        dateLastUpdated: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            get() {
+                return this.getDataValue('dateLastUpdated')
+                  ?.toISOString()
+                  .slice(0, 19)
+                  .replace('T', ' ');
+            },
+            validate: {
+                isDate: true
+            }
+        },
+        dateLastFetched: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            get() {
+                return this.getDataValue('dateLastFetched')
+                  ?.toISOString()
+                  .slice(0, 19)
+                  .replace('T', ' '); 
+            },
+            validate: {
+                isDate: true
+            }
+        },
+        dateExpiry: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            get() {
+                return this.getDataValue('dateExpiry')
+                  ?.toISOString()
+                  .slice(0, 19)
+                  .replace('T', ' '); 
+            },
+            validate: {
+                isDate: true
+            }
+        },
+        userId: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            index: true,
+            references: {
+                model: User,
+                key: 'id',
+                schema: options.schema
+                //schema: 'shorturls'
+                // model: {
+                //     tableName: 'users',
+                //     schema: 'your_schema_name', //both should work
+                //   },
+            }
+        },
+        premieredLink: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        categories: {
+            type: DataTypes.JSON,
+        },
+        customTag: {
+            type: DataTypes.JSON,
+        },
+        publicLink: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
+        },
+        rateLimits: {
+            type: DataTypes.INTEGER,
+            defaultValue: 10
+        }
+
+
+    },
+    {
+        ...options,
+        scopes: {
+            addURL: {
+                attributes: ["shorturl"]
+            },
+            fetchAllURLs: {
+                attributes: ["url", "shorturl", "description"]
+            },
+            stats: {
+                attributes: ["url", "shorturl", "clickCount", "uniqueClicks", "dateLastFetched", "categories", "customTag"]
+            }
+        }
+    });
+
+module.exports = ShortUrl;
